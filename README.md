@@ -1,18 +1,27 @@
 #----------------------------------------------------------------------------#
 #                         CognitiveSpaceWork                                 #
 #----------------------------------------------------------------------------#
+
+
 Author: Paul Hughes
+
 Readme version: 1.0
 
 #---
+
 Purpose:
+
 #---
+
+
 To show my ability in python, not just to show my ability to deal with orbital dynamics, but also to show
 that I can quickly produce thoughtful applications, and utilize common industry packages such as pandas.I also 
 want to show that I can produce readable, and maintainable code, althouth this code isn't the cleanest I admit
 
 #---
+
 Quick Start Guide:
+
 #---
 
 If the dependencies are installed, run the main.py program in your favorite IDE, or in command line.
@@ -36,12 +45,17 @@ You can also add earth to the plot because I thought that was a fun addition, al
 so that you can save all the data from the track, which should help if you want to do any checking.
 
 #---
+
 Additional Info:
+
 #---
+
 If you'd like to change the physical constants, or the rate at which data is recorded, go to the change constants file in utils/loading_constants.
 
 #---
+
 TroubleShooting/Caution
+
 #---
 
 If you input a character to the inputs that are expecting, the dialogue box that pops up restarts the kernel and the program, so just be aware of that.
@@ -52,11 +66,12 @@ Additionally, my personal pc ended up being upgraded to windows 11, and the pdm 
 pdm does not work, attempt to use anaconda or spyder to run the file.
 
 #---
+
 Future Work
+
 #---
 
 If I continue developing this project I would do some things different. For one I would probably seperate the functions from the config files into seperate folders,
 and work on the readability. Some of that problem came from spending only a small amount of time on this. I also would add the options to use different orbital 
-element sents like equinoctial elements, additional perturbation terms, and an interactive version of the 3D graph export. I also probably would work on making the gui
-more stable first of all, and then start adding some testing. I realize this was only supposed to be a homework problem that should only take a couple hours, but I 
+element sents like equinoctial elements, additional perturbation terms, and an interactive version of the 3D graph export. I also probably would work on making the gui more stable first, and then start adding some testing. I realize this was only supposed to be a homework problem that should only take a couple hours, but I 
 got carried away as I wanted to impress, and go a little above and beyond to show my worth.
