@@ -13,8 +13,6 @@ J3 = 0
 J4 = 0
 J5 = 0
 # spherical harmonics 
-#Constants
-m_deg2rad = np.pi/180.0
 
 #---
 # Simulation options
