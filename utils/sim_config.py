@@ -15,8 +15,7 @@ import logging
 from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.pyplot as plt
 import PIL
-import load_constants as CON
-#from . import sim_config
+import utils.load_constants as CON
 class config_self(object):
     '''
     Button Initialization
@@ -476,18 +475,19 @@ class config_self(object):
         '''
         cart0 = np.zeros(6)
         cart0 = config_self.kep2cart(a,e,i,O,w,v);
-        loading =Tk()
-        loading.wm_title("Simulating!")
-        #printer_dialogue(sim_out)
-        progress_var = DoubleVar()
-        self.progress= Progressbar(loading,variable = progress_var,maximum = tf, orient = HORIZONTAL, length = 300, mode = 'determinate')
+        
+        loading = Tk()
+        #Toplevel.__init__(self.window)
+        #loading.nid=0
+        #loading.title("Simulating!")
+        # The progress bar is not working
+        #self.progress_var = DoubleVar()
+        #self.progress= Progressbar(loading,variable = self.progress_var,maximum = tf, orient = HORIZONTAL, length = 300, mode = 'determinate')
 
-        top_label =Label(loading, text = "Simulation in progress")
+        top_label =Label(loading, text = "Simulation in progress, please wait")
         top_label.pack(side = 'top')
         # initialize data frame for storing info for quicker writing to file or manipulation later
-        self.progress.pack(pady=10)
-        print("got here")
-
+        #self.progress.pack(pady=10)
         cart1=cart0
         sim_out = pd.DataFrame(
             data = {'Time':0.0,
@@ -528,17 +528,21 @@ class config_self(object):
                     'v': kep[5]
                     }
                 sim_out.loc[int(t_k)] = point
-                progress_var.set(t_k)
-                loading.update()
+                #self.progress_var.set(t_k)
+                #self.progress.update()
+                #self.progress.update_idletasks()
+                #loading.update()
+                #loading.update_idletasks()
                 
             cart0 = cart1
-        self.window.destroy()
     
-        print("done now")
         #progress.stop
         loading.destroy()
         printer = PrinterDiag(sim_out)
         printer.printer_dialogue()
+        
+        self.window.destroy()
+
         return sim_out
     
         
@@ -622,19 +626,37 @@ class config_self(object):
         out[1,0] = cart[4,0]
         out[2,0] = cart[5,0]
         rn = np.linalg.norm(np.array([cart[0,0],cart[1,0],cart[2,0]]))
+        r_E =CON.r_E
+
         #two body acceleration 
         a2x = -CON.mu_E/np.power(rn,3)*cart[0,0]
         a2y = -CON.mu_E/np.power(rn,3)*cart[1,0]
         a2z = -CON.mu_E/np.power(rn,3)*cart[2,0]
-        if self.J2_switch== 1:
-            a2x=a2x+-3*J2*np.power(r_E,2)*CON.mu_E*cart[0,0]/(2*rn^5)*(1-5*np.power(cart[2]))/np.power(rn,2);
-            a2y=a2y+-3*J2*np.power(r_E,2)*CON.mu_E*cart[1,0]/(2*rn^5)*(1-5*np.power(cart[2]))/np.power(rn,2);
-            a2z=a2z+-3*J2*np.power(r_E,2)*CON.mu_E*cart[2,0]/(2*rn^5)*(3-5*np.power(cart[2]))/np.power(rn,2);
-        if self.J345_switch== 1:
+        if self.J2_switch.get()== 1:
+            J2 = CON.J2
+            cr= -3*J2*np.power(r_E,2)*CON.mu_E*cart[0,0]/(2.0*np.power(rn,5))
+            a2x=a2x-3*J2*np.power(r_E,2)*CON.mu_E*cart[0,0]/(2.0*np.power(rn,5))*(1.0-5.0*np.power(cart[2,0],2)/np.power(rn,2));
+            a2y=a2y-3*J2*np.power(r_E,2)*CON.mu_E*cart[1,0]/(2.0*np.power(rn,5))*(1.0-5.0*np.power(cart[2,0],2)/np.power(rn,2));
+            a2z=a2z-3*J2*np.power(r_E,2)*CON.mu_E*cart[2,0]/(2.0*np.power(rn,5))*(3.0-5.0*np.power(cart[2,0],2)/np.power(rn,2));
+        if self.J345_switch.get()== 1:
         #J2 acceleration 
-            a2x=a2x+0;
-            a2y=a2y+0;
-            a2z=a2z+0; 
+            J3 = CON.J3
+            J4 = CON.J4
+            J5 = CON.J5
+            a3x=-5*J3*np.power(r_E,3)*CON.mu_E*cart[0,0]/(2.0*np.power(rn,7)*(3*cart[2,0]-7*np.power(cart[2,0],3))/np.power(rn,2));
+            a3y=-5*J3*np.power(r_E,3)*CON.mu_E*cart[1,0]/(2.0*np.power(rn,7)*(3*cart[2,0]-7*np.power(cart[2,0],3))/np.power(rn,2));
+            a3z=-5*J3*np.power(r_E,3)*CON.mu_E/(2*np.power(rn,7))*(3*np.power(cart[2,0],2)-7*np.power(cart[2,0],4)/np.power(rn,2)-3.0/5.0*np.power(rn,2));
+            a4x = 15*J4*np.power(r_E,4)*CON.mu_E*cart[0,0]/(8.0*np.power(rn,7))*(1.0-14.0*np.power(cart[2,0],2)/np.power(rn,2)+21.0*np.power(cart[2,0],4)/np.power(rn,4))
+            a4y = 15*J4*np.power(r_E,4)*CON.mu_E*cart[1,0]/(8.0*np.power(rn,7))*(1.0-14.0*np.power(cart[2,0],2)/np.power(rn,2)+21.0*np.power(cart[2,0],4)/np.power(rn,4))
+            a4z = 15*J4*np.power(r_E,4)*CON.mu_E*cart[2,0]/(8.0*np.power(rn,7))*(5.0-70.0*np.power(cart[2,0],2)/(np.power(rn,2)*3)+21.0*np.power(cart[2,0],4)/np.power(rn,4))
+
+            a5x = 3*J5*np.power(r_E,5)*CON.mu_E*cart[0,0]*cart[2,0]/(8.0*np.power(rn,9))*(35.0-210.0*np.power(cart[2,0],2)/(np.power(rn,2))+231.0*np.power(cart[2,0],4)/np.power(rn,4))
+            a5y = 3*J5*np.power(r_E,5)*CON.mu_E*cart[1,0]*cart[2,0]/(8.0*np.power(rn,9))*(35.0-210.0*np.power(cart[2,0],2)/(np.power(rn,2))+231.0*np.power(cart[2,0],4)/np.power(rn,4))
+            a5z = 3*J5*np.power(r_E,5)*CON.mu_E*cart[2,0]*cart[2,0]/(8.0*np.power(rn,9))*(105.0-315.0*np.power(cart[2,0],2)/(np.power(rn,2))+231.0*np.power(cart[2,0],4)/np.power(rn,4))+15.0*J5*CON.mu_E*np.power(CON.r_E,5)/(8.0*np.power(rn,7))
+
+            a2x=a2x+a3x+a4x+a5x;
+            a2y=a2y+a3y+a4y+a5y;
+            a2z=a2z+a3z+a4z+a5z; 
         out[3,0] =a2x
         out[4,0] =a2y
         out[5,0] =a2z
@@ -658,24 +680,23 @@ Created on Tue Apr 19 09:51:24 2022
 
 @author: paulj
 """
-from tkinter import * 
-from tkinter.ttk import Progressbar
-import pandas as pd
-import numpy as np
-import os
-import sys
-import psutil
-import logging
-from mpl_toolkits.mplot3d import Axes3D
-import matplotlib.pyplot as plt
-import PIL
-import load_constants as CON
 class PrinterDiag():
     data = pd.Series()
+    az= DoubleVar()
+    el = DoubleVar()
+    x_variable = StringVar()
+    y_variable = StringVar()
+    showEarth = BooleanVar()
+    showSpeedMap = BooleanVar()
+
     def __init__(self,data):
         self.data = data
-       
-    def dataPlot(data, x_variable, y_variable, save):
+        self.showEarth.set(False)
+        self.showSpeedMap.set(True)
+        self.az.set(-60.0)
+        self.el.set = (30.0)
+
+    def dataPlot(self,data, x_variable, y_variable, save):
         x_var= x_variable.get()
         y_var = y_variable.get()
         graphTitle = y_var+" as a function of "+ x_var
@@ -686,7 +707,7 @@ class PrinterDiag():
             fig = plt_2D.get_figure()
             fig.savefig(graphTitle+'.png')
     
-    def plot_earth(data, showEarth, showSpeedMap, az, el): 
+    def plot_earth(self,data, showEarth, showSpeedMap, az, el): 
             showEarth= showEarth.get()
             showSpeedMap = showSpeedMap.get()
             az = az.get()
@@ -722,43 +743,33 @@ class PrinterDiag():
         data =self.data
         plot_dialogue = Tk()
         OPTIONS = data.columns.tolist()
-        x_variable = StringVar()
-        y_variable = StringVar()
-        showEarth = BooleanVar()
-        showSpeedMap = BooleanVar()
-        az= DoubleVar()
-        el = DoubleVar()
-        showEarth.set(False)
-        showSpeedMap.set(True)
-        az.set(-60.0)
-        el.set = (30.0)
-        w_az = Scale(plot_dialogue, from_=-180, to=180, orient=HORIZONTAL,variable =az)
-        w_el = Scale(plot_dialogue, from_=-90, to=90, orient=HORIZONTAL,variable = el)
+        w_az = Scale(plot_dialogue, from_=-180, to=180, orient=HORIZONTAL,variable = self.az)
+        w_el = Scale(plot_dialogue, from_=-90, to=90, orient=HORIZONTAL,variable =  self.el)
     
-        x_variable.set(OPTIONS[0])
+        self.x_variable.set(OPTIONS[0])
         
-        y_variable.set(OPTIONS[1])
-        w_x = OptionMenu(plot_dialogue, x_variable,*OPTIONS)
-        w_x.config(text=x_variable)
-        w_y = OptionMenu(plot_dialogue, y_variable,*OPTIONS)
-        w_y.config(text = y_variable)
+        self.y_variable.set(OPTIONS[1])
+        w_x = OptionMenu(plot_dialogue, self.x_variable,*OPTIONS)
+        w_x.config(text= self.x_variable)
+        w_y = OptionMenu(plot_dialogue,  self.y_variable,*OPTIONS)
+        w_y.config(text =  self.y_variable)
         Label(plot_dialogue, text = "Graph 2D Variables").grid(row =1)
         w_x.grid(row = 1, column =1)
         w_y.grid(row= 1, column = 2)
-        graph_btn = Button(plot_dialogue,text = "plot 2D Data", command = lambda :PrinterDiag.dataPlot(data, x_variable, y_variable,False))
+        graph_btn = Button(plot_dialogue,text = "plot 2D Data", command = lambda :PrinterDiag.dataPlot(self,data,  self.x_variable,  self.y_variable,False))
         graph_btn.grid(row = 1, column = 3)
-        save_graph_btn= Button(plot_dialogue,text = "save plot", command = lambda :PrinterDiag.dataPlot(data, x_variable, y_variable,True))
+        save_graph_btn= Button(plot_dialogue,text = "save plot", command = lambda :PrinterDiag.dataPlot(self,data,  self.x_variable,  self.y_variable,True))
         save_graph_btn.grid(row = 1, column = 4)
         save_csv_btn = Button(plot_dialogue, text = "save csv of sim data", command= data.to_csv('out.csv', index = False))
         save_csv_btn.grid(row = 6, column = 2)
         Label(plot_dialogue, text = "Configure 3D Plot Output:").grid(row=2, columnspan = 4)
-        earth_graph_btn = Button(plot_dialogue,text = "Export 3D Plot", command = lambda :PrinterDiag.plot_earth(data, showEarth, showSpeedMap, az, el))
+        earth_graph_btn = Button(plot_dialogue,text = "Export 3D Plot", command = lambda :PrinterDiag.plot_earth(self,data,  self.showEarth,  self.showSpeedMap,  self.az,  self.el))
         earth_graph_btn.grid(row = 6, column = 1)
-        earth_btn= Checkbutton(text="Show Earth",variable = showEarth, onvalue = True, offvalue = False)
-        showSpeedMap_btn= Checkbutton(text="Show Speed Map",variable = showSpeedMap, onvalue = True, offvalue = False)
+        earth_btn= Checkbutton(plot_dialogue,text="Show Earth",variable =  self.showEarth, onvalue = True, offvalue = False)
+        showSpeedMap_btn= Checkbutton(plot_dialogue,text="Show Speed Map",variable =  self.showSpeedMap, onvalue = True, offvalue = False)
         earth_btn.grid(row = 3, column =4)
         showSpeedMap_btn.grid(row = 4, column = 4)
         Label(plot_dialogue, text = "Azimuthal Viewing Angle").grid(row = 3)
         w_az.grid(row=3, column=1,columnspan = 2)
-        Label(plot_dialogue, text = "Azimuthal Viewing Angle").grid(row = 4)
+        Label(plot_dialogue, text = "Elevation Viewing Angle").grid(row = 4)
         w_el.grid(row=4, column=1,columnspan = 2)
