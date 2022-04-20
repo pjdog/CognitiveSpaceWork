@@ -5,7 +5,7 @@
 
 Author: Paul Hughes
 
-Readme version: 1.0
+Readme version: 1.1
 
 #---
 
@@ -40,9 +40,11 @@ reason, I coded a simple runge kutta 4th order ode solver. Anything more would h
 
 Once you hit submit, the app will then produce the track given the inputs. When it is finished the first windows close, and an 
 output dialogue box will pop up. You can pick any two variables to plot against eachother, and then have the plot print or save in 
-root folder of the program. Alternatively, you can use the 3-D model which allows you to produce a 3d plot of the track, with a heat map for speed.
+root folder of the program. It will plot the first variable from the dropdown as the x axis, with the second for the y.
+Alternatively, you can use the 3-D model which allows you to produce a 3d plot of the track, with a heat map for speed. 
 You can also add earth to the plot because I thought that was a fun addition, although earth is not accurate to the shape. There also is a save csv button
-so that you can save all the data from the track, which should help if you want to do any checking.
+so that you can save all the data from the track, which should help if you want to do any checking.I would have customized labels or done more to make the graphs 
+look pretty but this is already overkill.
 
 #---
 
